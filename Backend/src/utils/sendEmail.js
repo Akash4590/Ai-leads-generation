@@ -1,17 +1,16 @@
 import nodemailer from "nodemailer";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.MAILTRAP_HOST,
- port: Number(process.env.MAILTRAP_PORT),
-  auth: {
-    user: process.env.MAILTRAP_USER,
-    pass: process.env.MAILTRAP_PASS,
-  },
-});
-
 const sendEmail = async ({ to, subject, html }) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  });
+
   await transporter.sendMail({
-    from: '"AI Leads" <no-reply@aileads.com>',
+    from: `"AI Leads" <${process.env.GMAIL_USER}>`,
     to,
     subject,
     html,
