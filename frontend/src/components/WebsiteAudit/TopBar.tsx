@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ChevronDown,
   Plus,
@@ -11,22 +12,50 @@ import {
   LogOut,
   Sparkles,
   Check,
+  Loader2,
 } from "lucide-react";
+
+const API_BASE_URL = "http://localhost:5000/api";
 
 interface TopBarProps {
   onMenuClick: () => void;
   projectName: string;
 }
 
+interface UserData {
+  fullName: string;
+  email: string;
+  companyName?: string;
+  plan?: string;
+  avatar?: string;
+}
+
 export default function TopBar({
   onMenuClick,
   projectName,
 }: TopBarProps) {
+  const navigate = useNavigate();
   const [projectOpen, setProjectOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [user, setUser] = useState<UserData | null>(null);
 
   const projectRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  // Load logged-in user's data from storage on mount
+  useEffect(() => {
+    const storedUser =
+      localStorage.getItem("user") || sessionStorage.getItem("user");
+
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (err) {
+        console.error("Failed to parse user data:", err);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -50,6 +79,39 @@ export default function TopBar({
     return () =>
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+
+    try {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Logout request failed:", err);
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user");
+
+      setLoggingOut(false);
+      navigate("/");
+    }
+  };
+
+  const goToCreateProject = () => {
+    setProjectOpen(false);
+    navigate("/create-project");
+  };
 
   return (
     <header className="flex items-center justify-between gap-3 px-4 py-4 sm:px-8 sm:py-5">
@@ -108,7 +170,10 @@ export default function TopBar({
                 </div>
               </button>
 
-              <button className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-purple-600 py-3 text-sm font-medium text-white transition hover:bg-purple-500">
+              <button
+                onClick={goToCreateProject}
+                className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-purple-600 py-3 text-sm font-medium text-white transition hover:bg-purple-500"
+              >
                 <Plus className="h-4 w-4" />
                 Create New Project
               </button>
@@ -117,12 +182,18 @@ export default function TopBar({
         </div>
 
         {/* New Project */}
-        <button className="hidden cursor-pointer items-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-purple-500 hover:shadow-xl hover:shadow-purple-500/30 sm:flex">
+        <button
+          onClick={goToCreateProject}
+          className="hidden cursor-pointer items-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-purple-500 hover:shadow-xl hover:shadow-purple-500/30 sm:flex"
+        >
           <Plus className="h-4 w-4" />
           New Project
         </button>
 
-        <button className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-purple-600 text-white transition hover:bg-purple-500 sm:hidden">
+        <button
+          onClick={goToCreateProject}
+          className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-purple-600 text-white transition hover:bg-purple-500 sm:hidden"
+        >
           <Plus className="h-4 w-4" />
         </button>
 
@@ -147,17 +218,17 @@ export default function TopBar({
             className="flex cursor-pointer items-center gap-3 rounded-xl px-2 py-1 transition-all duration-300 hover:bg-white/5"
           >
             <img
-              src="https://i.pravatar.cc/100?img=13"
-              alt="Akash"
+              src={user?.avatar || "https://i.pravatar.cc/100?img=13"}
+              alt={user?.fullName || "User"}
               className="h-10 w-10 rounded-full border border-white/10 object-cover"
             />
 
             <div className="hidden text-left sm:block">
               <p className="text-sm font-semibold text-white">
-                Akash
+                {user?.fullName || "Guest"}
               </p>
               <p className="text-xs text-purple-400">
-                Pro Plan
+                {user?.plan || "Free Plan"}
               </p>
             </div>
 
@@ -170,7 +241,16 @@ export default function TopBar({
 
           {profileOpen && (
             <div className="absolute right-0 z-50 mt-3 w-64 rounded-2xl border border-white/10 bg-[#111827]/95 p-2 shadow-2xl backdrop-blur-xl">
-              <button className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 transition hover:bg-white/5">
+              <div className="border-b border-white/10 px-3 py-3">
+                <p className="text-sm font-semibold text-white truncate">
+                  {user?.fullName || "Guest"}
+                </p>
+                <p className="text-xs text-gray-400 truncate">
+                  {user?.email || "Not logged in"}
+                </p>
+              </div>
+
+              <button className="mt-1 flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 transition hover:bg-white/5">
                 <User className="h-4 w-4 text-purple-400" />
                 <span className="text-sm text-white">
                   My Profile
@@ -193,8 +273,16 @@ export default function TopBar({
 
               <div className="my-2 border-t border-white/10" />
 
-              <button className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-red-400 transition hover:bg-red-500/10">
-                <LogOut className="h-4 w-4" />
+              <button
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-red-400 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loggingOut ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <LogOut className="h-4 w-4" />
+                )}
                 Logout
               </button>
             </div>

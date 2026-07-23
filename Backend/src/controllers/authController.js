@@ -205,3 +205,30 @@ export const resetPassword = asyncHandler(async (req, res) => {
     user: user.toSafeObject(),
   });
 });
+
+// @desc    Upload/update user avatar
+// @route   POST /api/auth/upload-avatar
+// @access  Private
+export const uploadAvatar = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    res.status(400);
+    throw new Error("Please upload an image file");
+  }
+
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // req.file.path yahan Cloudinary ka URL hota hai (multer-storage-cloudinary ki wajah se)
+user.avatar = `/uploads/avatars/${req.file.filename}`;
+  await user.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    success: true,
+    message: "Avatar updated successfully",
+    user: user.toSafeObject(),
+  });
+});

@@ -104,11 +104,13 @@ export default function Login() {
       }
 
       // agar rememberMe checked hai to localStorage, warna sessionStorage
-      if (rememberMe) {
-        localStorage.setItem("token", data.token);
-      } else {
-        sessionStorage.setItem("token", data.token);
-      }
+     if (rememberMe) {
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("user", JSON.stringify(data.user));
+} else {
+  sessionStorage.setItem("token", data.token);
+  sessionStorage.setItem("user", JSON.stringify(data.user));
+}
 
       navigate("/dashboard");
     } catch (err) {

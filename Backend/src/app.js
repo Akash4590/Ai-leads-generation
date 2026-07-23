@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import projectRoutes from "./routes/projectRoutes.js";
+import auditRoutes from "./routes/auditRoutes.js";
 const app = express();
 
 app.use(
@@ -16,12 +17,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Uploaded files (avatars etc.) ko publicly serve karne ke liye
+app.use("/uploads", express.static("uploads"));
+
 app.get("/api/health", (req, res) => {
   res.status(200).json({ success: true, message: "Server is running" });
 });
 
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/audits", auditRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

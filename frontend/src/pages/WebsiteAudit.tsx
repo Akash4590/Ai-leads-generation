@@ -1,82 +1,73 @@
-import { Zap, Gauge, ShieldCheck } from "lucide-react";
-import Layout from "../components/WebsiteAudit/Layout";
-import Breadcrumb from "../components/WebsiteAudit/Breadcrumb";
-import AuditPageHeader from "../components/WebsiteAudit/Auditpageheader";
-import AuditSearchCard from "../components/WebsiteAudit/Auditsearchcard";
-import { AuditScoreCard, ScoreMetricCard } from "../components/WebsiteAudit/Auditscorecard";
-import OverviewCard from "../components/WebsiteAudit/Overviewcard";
-import WebsitePreviewCard from "../components/WebsiteAudit/Websitepreviewcard";
-import PerformanceIssuesCard from "../components/WebsiteAudit/Performanceissuescard";
-import SEOAnalysisCard from "../components/WebsiteAudit/Seoanalysiscard";
-import AccessibilityCard from "../components/WebsiteAudit/Accessibilitycard";
-import SecurityCheckCard from "../components/WebsiteAudit/Securitycheckcard";
-import RecommendationsCard from "../components/WebsiteAudit/Recommendationscard";
-import ScanInformationCard from "../components/WebsiteAudit/Scaninformationcard";
-import QuickActionsCard from "../components/WebsiteAudit/Quickactionscard";
+import { Globe, Waves, RotateCw, CheckCircle2, Loader2 } from "lucide-react";
 
-export default function WebsiteAudit() {
+interface AuditSearchCardProps {
+  url: string;
+  lastScannedText: string;
+  scanning: boolean;
+  onScan: () => void;
+}
+
+export default function AuditSearchCard({
+  url,
+  lastScannedText,
+  scanning,
+  onScan,
+}: AuditSearchCardProps) {
   return (
-    <Layout activeNav="Website Audit" projectName="GrowRise">
-      <div className="flex flex-col gap-6">
-        <Breadcrumb items={["Projects", "GrowRise", "Website Audit"]} />
-        <AuditPageHeader />
-        <AuditSearchCard />
-
-        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_360px]">
-          {/* Main content column */}
-          <div className="flex flex-col gap-5">
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-              <AuditScoreCard />
-              <ScoreMetricCard
-                icon={Gauge}
-                iconBg="bg-blue-500/15"
-                iconColor="text-blue-400"
-                title="SEO Score"
-                score={94}
-                status="Excellent"
-                barColor="bg-purple-500"
-              />
-              <ScoreMetricCard
-                icon={Zap}
-                iconBg="bg-blue-500/15"
-                iconColor="text-blue-400"
-                title="Performance"
-                score={91}
-                status="Excellent"
-                barColor="bg-blue-500"
-              />
-              <ScoreMetricCard
-                icon={ShieldCheck}
-                iconBg="bg-emerald-500/15"
-                iconColor="text-emerald-400"
-                title="Security"
-                score={96}
-                status="Excellent"
-                barColor="bg-emerald-500"
+    <div className="rounded-xl border border-purple-500/30 bg-white/[0.03] p-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex-1">
+          <label className="mb-2 block text-xs font-medium text-gray-400">
+            Website URL
+          </label>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="relative flex-1">
+              <Globe className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+              <input
+                type="text"
+                value={url}
+                readOnly
+                className="w-full rounded-lg border border-white/10 bg-white/[0.03] py-3 pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-gray-500 focus:border-purple-500/50"
               />
             </div>
-
-            <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-              <OverviewCard />
-              <WebsitePreviewCard />
-            </div>
-
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-              <PerformanceIssuesCard />
-              <SEOAnalysisCard />
-              <AccessibilityCard />
-              <SecurityCheckCard />
-            </div>
-          </div>
-
-          {/* Right sidebar column */}
-          <div className="flex flex-col gap-5">
-            <RecommendationsCard />
-            <ScanInformationCard />
-            <QuickActionsCard />
+            <button
+              onClick={onScan}
+              disabled={scanning}
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-3 text-sm font-medium text-white shadow-[0_0_20px_rgba(147,51,234,0.35)] transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {scanning ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Scanning... (may take up to 40s)
+                </>
+              ) : (
+                <>
+                  <Waves className="h-4 w-4" />
+                  Scan Website
+                </>
+              )}
+            </button>
           </div>
         </div>
+
+        <div className="flex items-center gap-3">
+          <div>
+            <p className="text-xs text-gray-400">Last scanned</p>
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-white">
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+              {lastScannedText}
+            </p>
+          </div>
+          <button
+            onClick={onScan}
+            disabled={scanning}
+            className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RotateCw className={`h-4 w-4 ${scanning ? "animate-spin" : ""}`} />
+            Re-scan
+          </button>
+        </div>
       </div>
-    </Layout>
+    </div>
   );
 }

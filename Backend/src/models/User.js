@@ -38,6 +38,10 @@ googleId: {
   unique: true,
   sparse: true,
 },
+    avatar: {
+      type: String,
+      default: "",
+    },
     plan: {
       type: String,
       enum: ["Free", "Pro", "Agency"],
@@ -78,6 +82,7 @@ userSchema.methods.toSafeObject = function () {
     fullName: this.fullName,
     email: this.email,
     companyName: this.companyName,
+    avatar: this.avatar,
     plan: this.plan,
     isVerified: this.isVerified,
     createdAt: this.createdAt,

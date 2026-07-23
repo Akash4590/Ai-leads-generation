@@ -1,26 +1,25 @@
 import { Check } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useState } from "react";
 
 interface AIModuleCardProps {
   icon: LucideIcon;
   title: string;
   description: string;
-  defaultChecked?: boolean;
+  checked: boolean;
+  onToggle: () => void;
 }
 
 export default function AIModuleCard({
   icon: Icon,
   title,
   description,
-  defaultChecked = true,
+  checked,
+  onToggle,
 }: AIModuleCardProps) {
-  const [checked, setChecked] = useState(defaultChecked);
-
   return (
     <button
       type="button"
-      onClick={() => setChecked((c) => !c)}
+      onClick={onToggle}
       className={`flex flex-col items-start gap-3 rounded-xl border p-4 text-left transition ${
         checked
           ? "border-purple-500/40 bg-purple-500/5"

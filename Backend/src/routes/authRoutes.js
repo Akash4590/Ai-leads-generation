@@ -7,9 +7,11 @@ import {
   getMe,
   forgotPassword,
   resetPassword,
+  uploadAvatar,
 } from "../controllers/authController.js";
 import { googleAuth } from "../controllers/googleAuthController.js";
 import { protect } from "../middleware/authMiddleware.js";
+import upload from "../config/multer.js";
 
 const router = express.Router();
 
@@ -31,5 +33,6 @@ router.post("/logout", protect, logout);
 router.get("/me", protect, getMe);
 router.post("/forgot-password", authLimiter, forgotPassword);
 router.post("/reset-password/:token", authLimiter, resetPassword);
+router.post("/upload-avatar", protect, upload.single("avatar"), uploadAvatar);
 
 export default router;

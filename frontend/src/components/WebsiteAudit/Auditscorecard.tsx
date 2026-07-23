@@ -1,31 +1,33 @@
-import type { LucideIcon } from "lucide-react";
-import CircularProgress from "../Dashboard/CircularProgress";
+import { LucideIcon } from "lucide-react";
+import CircularProgress from "../CircularProgress";
 
-export function AuditScoreCard() {
+interface AuditScoreCardProps {
+  score: number;
+  status: string;
+  changeLabel?: string;
+}
+
+export function AuditScoreCard({
+  score,
+  status,
+  changeLabel = "vs last scan",
+}: AuditScoreCardProps) {
   return (
     <div className="rounded-xl border border-purple-500/30 bg-white/[0.03] p-6">
       <p className="text-sm font-semibold text-white">Overall Score</p>
       <div className="mt-4 flex items-center gap-5">
         <CircularProgress
-          value={92}
+          value={score}
           size={100}
           strokeWidth={9}
-          label="92"
+          label={String(score)}
           sublabel="/100"
         />
         <div>
           <p className="text-base font-semibold text-emerald-400">
-            Excellent
+            {status}
           </p>
-          <p className="mt-1 text-xs text-gray-400">
-            Your website is performing great!
-          </p>
-          <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-medium text-emerald-400">
-            ↑ 12%
-          </span>
-          <span className="ml-1 text-[11px] text-gray-500">
-            vs last scan
-          </span>
+          <p className="mt-1 text-xs text-gray-400">{changeLabel}</p>
         </div>
       </div>
     </div>

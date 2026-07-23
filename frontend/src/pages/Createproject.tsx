@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Sidebar from "../components/Dashboard/Sidebar";
-import TopNavbar from "../components/Dashboard/TopBar";
+import TopBar from "../components/Dashboard/TopBar";
 import BackgroundGlow from "../components/Createproject/Backgroundglow";
 import Stepper from "../components/Createproject/Stepper";
 import WorkspaceIntroCard from "../components/Createproject/Workspaceintrocard";
@@ -22,7 +22,7 @@ export default function CreateProject() {
       />
 
       <div className="relative z-10 min-w-0 flex-1">
-        <TopNavbar onMenuClick={() => setSidebarOpen(true)} />
+        <TopBar onMenuClick={() => setSidebarOpen(true)} />
 
         <main className="px-4 pb-10 sm:px-6 lg:px-8">
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-start">
